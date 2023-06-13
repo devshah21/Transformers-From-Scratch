@@ -12,6 +12,8 @@ class SelfAttention(nn.Module):
         
         assert (self.head_dim * heads == embed_size) # sanity check to ensure values allign
         
+        # nn.Linear basically does weight * input + bias --> y = mx +b
+        
         self.values = nn.Linear(self.head_dim, self.head_dim, bias=False) # map the head dimensions to the head dimensions
         self.keys = nn.Linear(self.head_dim, self.head_dim, bias=False) # same thing again here
         self.queries = nn.Linear(self.head_dim, self.head_dim, bias=False) 
@@ -45,6 +47,21 @@ class SelfAttention(nn.Module):
         
         out = self.fc_out(out)
         return out
+    
+
+class TransformerBlock(nn.Module):
+    def __init__(self, embed_size, heads, dropout, forward_exp):
+        super(TransformerBlock, self).__init__()
+        self.attention = SelfAttention(embed_size, heads)
+        self.norm1 = nn.LayerNorm(embed_size) # layer norm takes the average of every single example and normalizes 
+        self.norm2 = nn.LayerNorm(embed_size)
+        
+        # feedforward part:
+        
+        self.feed_forward = nn.Sequential(
+            nn.Linear(embed_size, forward_exp*embed_size), 
+        )
+        
         
         
         
