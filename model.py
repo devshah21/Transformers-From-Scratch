@@ -24,8 +24,28 @@ class SelfAttention(nn.Module):
         # split the embeddings into self.head pieces
         values = values.reshape(N, value_len, self.heads, self.head_dim) 
         keys = keys.reshape(N, key_len, self.heads, self.head_dim)
-        query = query.reshape(N, query_len, self.heads, self.head_dim)
+        queries = query.reshape(N, query_len, self.heads, self.head_dim)
         
-        eng = torch.einsum("nqhd,nkhd->nhqk")
+        eng = torch.einsum("nqhd,nkhd->nhqk", [queries, keys])
         # eng shape: (N, heads, query_len, key_len)
+        # queries shape: N, query_len, heads, heads_dim
+        # keys shape: N, keys_len, heads, head_dim
+        # energy shape: N, queries_len, key_len
+        if mask is not None:
+            eng = eng.masked_fill(mask == 0, float("-1e20")) # mask for target is a traingular matrix; when closing, we replace element with a float
         
+        attention = torch.softmax(eng / (self.embed_szie ** (1/2)), dim=3) # dim = 3 is used to normalize across the source sentence
+        
+        out = torch.einsum("nhql,nlhd->", [attention, values]).reshape(
+            N, query_len, self.heads*self.head_dim
+        )
+        # attention shape: N, heads, query_len, key_len
+        # values shape: N, values_len, heads, heads_dim
+        # after einsum (N, query_len, heads, heads_dim) then flatten last two dimensions
+        
+        out = self.fc_out(out)
+        return out
+        
+        
+        
+            
