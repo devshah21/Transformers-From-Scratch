@@ -61,6 +61,8 @@ class TransformerBlock(nn.Module):
         self.feed_forward = nn.Sequential(
             nn.Linear(embed_size, forward_exp*embed_size), 
         )
+
+        
         
         
         
