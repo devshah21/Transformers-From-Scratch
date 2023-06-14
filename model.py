@@ -28,7 +28,7 @@ class SelfAttention(nn.Module):
         keys = keys.reshape(N, key_len, self.heads, self.head_dim)
         queries = query.reshape(N, query_len, self.heads, self.head_dim)
         
-        eng = torch.einsum("nqhd,nkhd->nhqk", [queries, keys])
+        eng = torch.einsum("nqhd,nkhd->nhqk", [queries, keys]) 
         # eng shape: (N, heads, query_len, key_len)
         # queries shape: N, query_len, heads, heads_dim
         # keys shape: N, keys_len, heads, head_dim
