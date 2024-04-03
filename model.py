@@ -12,7 +12,7 @@ class SelfAttention(nn.Module):
         
         assert (self.head_dim * heads == embed_size) # sanity check to ensure values allign
         
-        # nn.Linear basically does weight * input + bias --> y = mx +b
+        # nn.Linear basically does weight * input + bias --> y = mx +b 
         
         self.values = nn.Linear(self.head_dim, self.head_dim, bias=False) # map the head dimensions to the head dimensions
         self.keys = nn.Linear(self.head_dim, self.head_dim, bias=False) # same thing again here
